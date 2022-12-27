@@ -4,7 +4,7 @@ import pretty_errors
 
 os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "hide"
 
-print("\n -- Welcome to Panik-Core Engine V0.8.6 --\n - The Rect Update -")
+print("\n -- Welcome to Panik-Core Engine V0.8.7 --\n - The FPS Update -")
 
 import pygame
 from pygame.locals import *

@@ -9,6 +9,7 @@ class Map:
         road_tileset = pk.TileSet("assets/tilesets/road_tileset.png")
         asphalt_tileset = pk.TileSet("assets/tilesets/asphalt_tileset.png")
         outdoor_walls_tileset = pk.TileSet("assets/tilesets/outdoors_stuff_tileset.png")
+        outdoor_walls_tileset.load()
         grass_sand_tileset = pk.TileSet("assets/tilesets/grass-sand_tileset.png")
         outdoor_props_tileset = pk.TileSet("assets/tilesets/outdoors_props_tileset.png")
 

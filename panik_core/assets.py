@@ -47,12 +47,12 @@ class TileSet:
         "Loads image from x,y,x+offset,y+offset"
         rect = pygame.Rect(rectangle)
         image = pygame.Surface(rect.size, pygame.SRCALPHA, 32).convert_alpha()
-        image.set_colorkey(None, pygame.RLEACCEL)
         image.blit(self.sheet, (0, 0), rect)
-        # if np.any(pygame.surfarray.pixels_alpha(image) != 0):
-        #     re = Image(image)
-        #     return re
-        # return None
+
+        
+        if not np.any(pygame.surfarray.array_alpha(image) == 0):
+            image = pygame.Surface(rect.size, depth=32).convert()
+            image.blit(self.sheet, (0, 0), rect)
         return Image(image)
 
     def load(self, tile_dimensions=16):

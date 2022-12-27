@@ -50,7 +50,7 @@ class Window:
         self.icon = icon
         self.bg = (255, 255, 255)
         self.WIN = pygame.display.set_mode(
-            (self.width, self.height), pygame.SCALED, display=0, vsync=0
+            (self.width, self.height), display=0, vsync=1
         )
         pygame.display.set_caption(title)
         if self.icon:
@@ -96,18 +96,9 @@ class Window:
         self.delta_time = self.clock.tick(fps) / 1000.0
         return self.delta_time
 
-    def setResizable(self):
-        self.WIN = pygame.display.set_mode((self.width, self.height), pygame.RESIZABLE)
-
     def setFullscreen(self):
         self.WIN = pygame.display.set_mode((0, 0), FULLSCREEN | DOUBLEBUF, 16)
         self.winsize_cache = self.winsize
-
-    def setTitle(self, title):
-        pygame.display.set_caption(title)
-
-    def setIcon(self, icon):
-        pygame.display.set_icon(pygame.image.load(icon).convert_alpha())
 
     def render(self, ui=None):
         self.starttime = time.time()  ## for timing

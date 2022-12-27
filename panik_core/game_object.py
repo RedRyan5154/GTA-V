@@ -62,7 +62,7 @@ class TileMap:
                     )
                 except KeyError:
                     raise Exception(
-                        "The tilemap and tileset do not accord to the same tile. MABY YOU HAVE LINKED THE WRONG TILESET OR TILEMAP"
+                        "The tilemap and tileset do not accord to the same tile. MAYBIE YOU HAVE LINKED THE WRONG TILESET OR TILEMAP"
                     )
                 self.tiles.append(Tile(x, y, _tile, self.tile_size))
 

@@ -5,9 +5,9 @@ from player import Player
 
 class Game:
     def __init__(self):
-        self.win = pk.Window("My Window", 1080, 720)
+        self.win = pk.Window("My Window", 1920, 1080)
         self.win.showfps = True
-        self.win.setFullscreen()
+        # self.win.setFullscreen()
 
         self.map = Map(self.win)
         self.player = Player(self.win)
