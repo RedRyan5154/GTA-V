@@ -209,77 +209,10 @@ class Window:
                     (element.parent.x if element.parent else 0),
                     (element.parent.y if element.parent else 0),
                 )
-                element.group.draw(self.WIN)
+                if not element.hide:
+                    element.group.draw(self.WIN)
             elif element.type == "rect":
                 pygame.draw.rect(self.WIN, element.color, element)
-            elif element.type == "particle":
-
-                ## transform image
-
-                if element.rotation != 0:
-                    image = pygame.transform.rotate(element.image, element.rotation)
-                    if element.rotation > 360 or element.rotation < -360:
-                        element.rotation = 0
-                else:
-                    image = element.image
-
-                ## center image
-                if element.parent:
-                    draw_x = (
-                        element.x
-                        - image.get_width() / 2
-                        - self.camara.x
-                        - self.camara.chx
-                        + element.parent.x
-                    )
-                    draw_y = (
-                        element.y
-                        - image.get_height() / 2
-                        - self.camara.y
-                        - self.camara.chy
-                        + element.parent.y
-                    )
-                else:
-                    draw_x = (
-                        element.x
-                        - image.get_width() / 2
-                        - self.camara.x
-                        - self.camara.chx
-                    )
-                    draw_y = (
-                        element.y
-                        - image.get_height() / 2
-                        - self.camara.y
-                        - self.camara.chy
-                    )
-
-                ## blit image
-                self.WIN.blit(image, (draw_x, draw_y))
-
-                ## colision
-                if element.colision:
-                    ## center colision
-                    element.colision.x = (
-                        element.x
-                        + element.cx
-                        - element.cw / 2
-                        - self.camara.x
-                        - self.camara.chx
-                    )
-                    element.colision.y = (
-                        element.y
-                        + element.cy
-                        - element.ch / 2
-                        - self.camara.y
-                        - self.camara.chy
-                    )
-
-                    if self.devmode:
-                        text = self.font.render("ID: " + element.id, True, (0, 0, 0))
-                        pygame.draw.rect(self.WIN, (0, 0, 0), element.colision, 4)
-                        self.WIN.blit(
-                            text, (element.colision.x, element.colision.y - 25)
-                        )
 
         self.camara.chx = 0
         self.camara.chy = 0

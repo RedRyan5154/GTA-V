@@ -7,15 +7,10 @@ class Image:
     def __init__(self, path):
         if type(path) == str:
             self.image = pygame.image.load(path).convert_alpha()
+            if not np.any(pygame.surfarray.array_alpha(self.image) == 0):
+                self.image = pygame.image.load(path).convert()
         else:
             self.image = path
-
-    def scale_image(self, scale):
-        self.scale = scale
-        self.w = scale * self.image.get_width() / 100
-        self.h = scale * self.image.get_height() / 100
-
-        self.image = pygame.transform.scale(self.image, (self.w, self.h))
 
 
 class Animation:
@@ -27,6 +22,8 @@ class Animation:
                 out = os.path.join(path, filename)
                 key = filename[:-4]
                 self.uanimations[key] = pygame.image.load(out).convert_alpha()
+                if not np.any(pygame.surfarray.array_alpha(self.uanimations[key]) == 0):
+                    self.uanimations[key] = pygame.image.load(out).convert()
 
         sorted_keys = sorted(self.uanimations.keys())
         for i in sorted_keys:

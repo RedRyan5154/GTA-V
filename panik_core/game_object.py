@@ -31,6 +31,8 @@ class TileMap:
 
         self.width = len(data[0]) * self.tile_size
         self.height = len(data) * self.tile_size
+        
+        self.hide = False
 
         class Tile(pygame.sprite.Sprite):
             def __init__(self, x, y, tile_img, tilesize) -> None:
@@ -144,6 +146,7 @@ class Element:
 
         self.type = "element"
         self.parent = parent
+        
 
         ## perform the correct transformations
 
@@ -173,15 +176,28 @@ class Element:
         self.colision = pygame.Rect(
             self.x + relative_x - w / 2, self.y + relative_y - h / 2, w, h
         )
+        
 
     def is_coliding(self, colision):
-        if type(colision) == list:
-            return 1 if self.collidelist(colision) != -1 else 0
-        else:
-            if colision.type == "rect":
-                return self.colliderect(colision)
+        if self.colision:
+            if type(colision) == list:
+                return 1 if self.colision.collidelist(colision) != -1 else 0
             else:
-                return self.colliderect(colision.colision)
+                if colision.type == "rect":
+                    return self.colision.colliderect(colision)
+                else:
+                    return self.colision.colliderect(colision.colision)
+        else:
+            raise Exception("You dont have any colisions set up for this element")
+                
+    def is_coliding_tilemap(self, tilemap):
+        if self.colision:
+            sprite=pygame.sprite.Sprite()
+            sprite.rect = self.colision
+            return 1 if pygame.sprite.spritecollideany(sprite, tilemap.group) else 0
+        else:
+            raise Exception("You dont have any colisions set up for this element")
+        
 
     # Movement ------------------------------------------------------------------------#
 
@@ -199,22 +215,52 @@ class Element:
         self.y += y
 
     def try_move_x(self, x, colisions=[]):
-        self.x += x
-        self.colision.x += x
-        if self.is_coliding(colisions):
-            self.x -= x
-            self.colision.x -= x
-            return False
-        return True
+        if self.colision:
+            self.x += x
+            self.colision.x += x
+            if self.is_coliding(colisions):
+                self.x -= x
+                self.colision.x -= x
+                return False
+            return True
+        else:
+            raise Exception("You dont have any colisions set up for this element")
 
     def try_move_y(self, y, colisions=[]):
-        self.y += y
-        self.colision.y += y
-        if self.is_coliding(colisions):
-            self.y -= y
-            self.colision.y -= y
-            return False
-        return True
+        if self.colision:
+            self.y += y
+            self.colision.y += y
+            if self.is_coliding(colisions):
+                self.y -= y
+                self.colision.y -= y
+                return False
+            return True
+        else:
+            raise Exception("You dont have any colisions set up for this element")
+    
+    def try_move_x_tilemap(self, x, tilemap):
+        if self.colision:
+            self.x += x
+            self.colision.x += x
+            if self.is_coliding_tilemap(tilemap):
+                self.x -= x
+                self.colision.x -= x
+                return False
+            return True
+        else:
+            raise Exception("You dont have any colisions set up for this element")
+
+    def try_move_y_tilemap(self, y, tilemap):
+        if self.colision:
+            self.y += y
+            self.colision.y += y
+            if self.is_coliding_tilemap(tilemap):
+                self.y -= y
+                self.colision.y -= y
+                return False
+            return True
+        else:
+            raise Exception("You dont have any colisions set up for this element")
 
     # Image Manipulation --------------------------------------------------------------#
 
@@ -280,97 +326,6 @@ class Element:
         self.flip = flip
 
         self.image = pygame.transform.flip(self.image, fx, fy)
-
-
-class Particle:
-    def __init__(self, image, x, y, scale, rotation, parent=None):
-
-        if type(image) == str:
-            self.image = pygame.image.load(image).convert_alpha()
-        else:
-            self.image = image.image
-
-        self.x, self.y = x, y
-        self.w = scale * self.image.get_width() / 100
-        self.h = scale * self.image.get_height() / 100
-        self.scale = scale
-        self.rotation = rotation
-
-        self.colision = None
-
-        self.type = "particle"
-        self.parent = parent
-
-        ## perform the correct transformations
-
-        self.image = pygame.transform.rotate(
-            pygame.transform.scale(self.image, (self.w, self.h)),
-            self.rotation,
-        )
-        ## animation data
-
-        self.animationidx = 0
-        self.starttime = time.time()
-
-    # Colision ------------------------------------------------------------------------#
-
-    def add_colision(self, id, relative_x, relative_y, w, h):
-        self.id = id
-        self.cx = relative_x
-        self.cy = relative_y
-        self.cw = w
-        self.ch = h
-        self.colision = pygame.Rect(
-            self.x + relative_x - w / 2, self.y + relative_y - h / 2, w, h
-        )
-
-    def is_coliding(self, colision):
-        if type(colision) == list:
-            return self.colision.collidelist(colision)
-        else:
-            return self.colision.colliderect(colision)
-
-    # Image Manipulation --------------------------------------------------------------#
-
-    def animate(self, animation, delay=0.1):
-        if time.time() - self.starttime > delay:
-            self.starttime = time.time()
-            if self.animationidx >= len(animation.animations) - 1:
-                self.animationidx = 0
-            else:
-                self.animationidx += 1
-            self.image = list(animation.animations.values())[self.animationidx]
-            self.size_x, self.size_y = (
-                self.scale * self.image.get_width() / 100,
-                self.scale * self.image.get_height() / 100,
-            )
-            self.image = pygame.transform.flip(self.image, self.flip[0], self.flip[1])
-            self.scale_image(self.scale)
-
-    def set_image(self, image):
-        ## check if image is pre loaded or not
-
-        if type(image) == str:
-            self.image = pygame.image.load(image).convert_alpha()
-        else:
-            self.image = image.image
-
-        ## perform the correct transformations
-        self.image = pygame.transform.flip(self.image, self.flip[0], self.flip[1])
-        self.scale_image(self.scale)
-
-    def scale_image(self, scale):
-        self.scale = scale
-        self.w = scale * self.image.get_width() / 100
-        self.h = scale * self.image.get_height() / 100
-
-        self.image = pygame.transform.scale(self.image, (self.w, self.h))
-
-    def resize_image(self, w, h):
-        self.w = w
-        self.h = h
-
-        self.image = pygame.transform.scale(self.image, (self.w, self.h))
 
 
 class Parent:

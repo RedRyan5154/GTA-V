@@ -5,12 +5,12 @@ from player import Player
 
 class Game:
     def __init__(self):
-        self.win = pk.Window("My Window", 1920, 1080)
+        self.win = pk.Window("My Window", 1080, 720)
         self.win.showfps = True
         # self.win.setFullscreen()
 
         self.map = Map(self.win)
-        self.player = Player(self.win)
+        self.player = Player(self.win, self.map)
 
     def run(self):
         run = 1
@@ -29,8 +29,8 @@ class Game:
                     if event.key == pk.kK:
                         self.win.devmode = not self.win.devmode
 
-            self.player.update(dt, self.map)
             self.map.update(dt)
+            self.player.update(dt)
             self.win.render()
 
 

@@ -71,6 +71,7 @@ class Map:
         )
 
     def update(self, dt):
+        self.dev_tools_map.hide = not self.win.devmode
         self.win.blit(
             [
                 self.map_roads,
@@ -78,6 +79,6 @@ class Map:
                 self.map_outdoor_walls,
                 self.map_grass_sand,
                 self.map_outdoor_props,
-                (self.dev_tools_map if self.win.devmode else None),
+                self.dev_tools_map
             ]
         )
