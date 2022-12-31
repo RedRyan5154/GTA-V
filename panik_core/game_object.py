@@ -44,6 +44,8 @@ class TileMap:
                     tilesize,
                     tilesize,
                 )
+                self.mask = pygame.mask.from_surface(self.image)
+                self.mask   
                 self.x, self.y = x * tilesize, y * tilesize
 
             def update(self, cx, cy, csx, csy, px, py):
@@ -146,6 +148,8 @@ class Element:
 
         self.type = "element"
         self.parent = parent
+        self.hide = False
+        self.is_hud = False
         
 
         ## perform the correct transformations
@@ -201,12 +205,92 @@ class Element:
 
     # Movement ------------------------------------------------------------------------#
 
-    def move_in_direction(self, direction, pixels):
+    def move_in_direction(self, direction, pixels) -> tuple[float, float, float]:
+        """
+        Move in direction (direction) (pixels) pixels
+        Return: x, y, direction
+        """
         direction = math.radians(direction)
         mx = math.cos(-direction) * pixels
         my = math.sin(-direction) * pixels
-        self.x += mx
-        self.y += my
+        self.move_x(mx)
+        self.move_y(my)
+        return mx, my, math.degrees(direction)
+
+    def try_move_in_direction(self, direction, pixels, colisions=[]) -> tuple[float, float, bool, bool, float]:
+        """
+        Try move in direction (direction) (pixels) pixels
+        Return: x, y, has_collided_x, has_collided_y, direction
+        """
+        direction = math.radians(direction)
+        mx = math.cos(-direction) * pixels
+        my = math.sin(-direction) * pixels
+        cx=self.try_move_x(mx, colisions)
+        cy=self.try_move_y(my, colisions)
+        return mx, my, cx, cy, math.degrees(direction)
+
+    def try_move_in_direction_tilemap(self, direction, pixels, tilemap) -> tuple[float, float, bool, bool, float]:
+        """
+        Try move in direction (direction) (pixels) pixels
+        Return: x, y, has_collided_x, has_collided_y, direction
+        """
+        direction = math.radians(direction)
+        mx = math.cos(-direction) * pixels
+        my = math.sin(-direction) * pixels
+        cx=self.try_move_x_tilemap(mx, tilemap)
+        cy=self.try_move_y_tilemap(my, tilemap)
+        return mx, my, cx, cy, math.degrees(direction)
+    
+    def move_towards(self, x, y, pixels) -> tuple[float, float, float]:
+        """
+        Move towards x/y
+        TIP: If using the camera, add the camera x and y to the initial x and y
+        Example: player.move_towards(x-self.window.camara.x, y-self.window.camara.y, 30)
+        Return: x, y, direction
+        """
+        direction = -math.atan2(y-self.y, x-self.x)
+        mx = math.cos(-direction) * pixels
+        my = math.sin(-direction) * pixels
+        self.move_x(mx)
+        self.move_y(my)
+        return mx, my, math.degrees(direction)
+    
+    def try_move_towards(self, x, y, pixels, colisions=[]) -> tuple[float, float, bool, bool, float]:
+        """
+        Try moving towards x/y
+        TIP: If using the camera, add the camera x and y to the initial x and y
+        Example: player.move_towards(x-self.window.camara.x, y-self.window.camara.y, 30)
+        Return: x, y, has_collided_x, has_collided_y, direction
+        """
+        direction = -math.atan2(y-self.y, x-self.x)
+        mx = math.cos(-direction) * pixels
+        my = math.sin(-direction) * pixels
+        cx=self.try_move_x(mx, colisions)
+        cy=self.try_move_y(my, colisions)
+        return mx, my, cx, cy, math.degrees(direction)
+    
+    def try_move_towards_tilemap(self, x, y, pixels, tilemap) -> tuple[float, float, bool, bool, float]:
+        """
+        Move towards x/y
+        TIP: If using the camera, add the camera x and y to the initial x and y
+        Example: player.move_towards(x-self.window.camara.x, y-self.window.camara.y, 30)
+        Return: x, y, has_collided_x, has_collided_y, direction
+        """
+        direction = -math.atan2(y-self.y, x-self.x)
+        mx = math.cos(-direction) * pixels
+        my = math.sin(-direction) * pixels
+        cx=self.try_move_x_tilemap(mx, tilemap)
+        cy=self.try_move_y_tilemap(my, tilemap)
+        return mx, my, cx, cy, math.degrees(direction)
+    
+    def point_towards(self, x, y) -> float:
+        """
+        Point towards x/y
+        TIP: If using the camera, add the camera x and y to the initial x and y
+        Example: player.point_towards(x-self.window.camara.x, y-self.window.camara.y)
+        """
+        self.rotation = math.degrees(-math.atan2(y-self.y, x-self.x))
+        return self.rotation
 
     def move_x(self, x):
         self.x += x
@@ -375,7 +459,7 @@ class Sound:
         )
 
     def stop(self):
-        pygame.mixer.Channel(int(self.channel)).stop(self.audio)
+        pygame.mixer.Channel(int(self.channel)).stop()
 
     def set_volume(self, volume=100):
         pygame.mixer.Channel(int(self.channel)).set_volume(volume / 100)

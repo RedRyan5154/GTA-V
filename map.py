@@ -11,7 +11,6 @@ class Map:
         outdoor_walls_tileset = pk.TileSet("assets/tilesets/outdoors_stuff_tileset.png")
         outdoor_walls_tileset.load()
         grass_sand_tileset = pk.TileSet("assets/tilesets/grass-sand_tileset.png")
-        outdoor_props_tileset = pk.TileSet("assets/tilesets/outdoors_props_tileset.png")
 
         # dev stuff
         dev_tools_tileset = pk.TileSet("assets/tilesets/dev_stuff.png")
@@ -60,15 +59,6 @@ class Map:
             0,
             self.map_parent,
         )
-        self.map_outdoor_props = pk.TileMap(
-            "assets/map_outdoor props.csv",
-            16,
-            outdoor_props_tileset.load(),
-            750,
-            0,
-            0,
-            self.map_parent,
-        )
 
     def update(self, dt):
         self.dev_tools_map.hide = not self.win.devmode
@@ -78,7 +68,6 @@ class Map:
                 self.map_asphalt,
                 self.map_outdoor_walls,
                 self.map_grass_sand,
-                self.map_outdoor_props,
                 self.dev_tools_map
             ]
         )

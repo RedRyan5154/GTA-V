@@ -19,7 +19,7 @@ from panik_core.window import *
 from panik_core.game_object import *
 from panik_core.assets import *
 from panik_core.ui import *
-from panik_core.mouse import *
+import panik_core.mouse as Mouse
 from panik_core.utils import *
 
 # ^^^^^^^^^^^ Import submodules
@@ -120,4 +120,4 @@ def quit():
 
 
 def optimize():
-    pygame.event.set_allowed([QUIT, KEYDOWN, KEYUP])
+    pygame.event.set_blocked([pygame.MOUSEMOTION, pygame.TEXTINPUT])

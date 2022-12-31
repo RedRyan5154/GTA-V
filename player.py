@@ -7,12 +7,16 @@ class Player(pk.Element):
         self.map = map
         self.load_anims()
         self.ww, self.wh = self.win.winsize
-        super().__init__(self.still["3"], self.ww/2, self.wh/2, 750)
+        super().__init__(self.still["1"], self.ww/2, self.wh/2, 750)
         self.add_colision("player", 0, 110, 130, 30)
         
         # player data
-        self.direction = "3"
-        self.movement = pk.Vec2()
+        self.direction = "1"
+        self.deg = 0
+        
+        pointer = pk.Image("assets/hud/pointer.png")
+        self.pointer = pk.Element(pointer, 0, 0, 750)
+        pk.Mouse.hide()
 
     def load_anims(self):
         self.idle = {
@@ -34,37 +38,58 @@ class Player(pk.Element):
             "4": pk.Animation("assets/player/walk/walk4")
         }
  
-    def input(self, dt): 
-        k = pk.Keys.get()
+    def input(self, dt):        
+        if 1:
+            self.deg = self.point_towards(self.pointer.x, self.pointer.y)
+            if self.deg < 45 and self.deg > 0 or self.deg > -45 and self.deg < 0:
+                self.direction="1"
+            elif self.deg > 135 and self.deg < 180 or self.deg < -135 and self.deg > -180:
+                self.direction="2"
+            elif self.deg > 45 and self.deg < 135:
+                self.direction="4"
+            elif self.deg < -45 and self.deg > -135:
+                self.direction="3"
+            self.rotation=0
+            k = pk.Keys.get()
+            
+            if k[pk.kSHIFT]:
+                sprint = 1
+            else:
+                sprint = 0
 
-        if k[pk.kW]:
-            self.movement.y = -1
-            # self.y -= 300 * dt
-        elif k[pk.kS]:
-            self.movement.y = 1
-            # self.y += 300 * dt
-        else:
-            self.movement.y=0
-            
-        if k[pk.kA]:
-            self.movement.x = -1
-            # self.x -= 300 * dt
-        elif k[pk.kD]:
-            self.movement.x = 1
-            # self.x += 300 * dt
-        else:
-            self.movement.x=0
-            
+            if k[pk.kW]:
+                self.deg = self.try_move_towards_tilemap(self.pointer.x, self.pointer.y, (200+(150 if sprint else 0)) * dt, self.map.dev_tools_map)[4]
+                self.animate(self.walk[self.direction], (0.075 if sprint else 0.125))
+            elif k[pk.kS]:
+                self.deg = self.try_move_towards_tilemap(self.pointer.x, self.pointer.y, (-150+(-100 if sprint else 0)) * dt, self.map.dev_tools_map)[4]
+                self.animate(self.walk[self.direction], (0.075 if sprint else 0.125))
+                
+            if k[pk.kA]:
+                self.try_move_in_direction_tilemap(self.deg+90, 150*dt, self.map.dev_tools_map)[4]
+                if not any([k[pk.kW], k[pk.kS]]):
+                    self.animate(self.walk[self.direction], 0.15)
+            elif k[pk.kD]:
+                self.try_move_in_direction_tilemap(self.deg-90, 150*dt, self.map.dev_tools_map)[4]
+                if not any([k[pk.kW], k[pk.kS]]):
+                    self.animate(self.walk[self.direction], 0.15)
+                
+            if not any([k[pk.kW], k[pk.kS], k[pk.kA], k[pk.kD]]):
+                self.animate(self.idle[self.direction], 0.35) 
     
-    def move(self, dt):
-        if self.movement.magnitude() > 0:
-            self.movement.normalize()
-        self.try_move_x_tilemap(self.movement.x * 300 * dt, self.map.dev_tools_map)
-        self.try_move_y_tilemap(self.movement.y * 300 * dt, self.map.dev_tools_map)
+    def camera(self, dt):
+        mx, my = pk.Mouse.mouse_pos()
+        self.pointer.x, self.pointer.y = mx+self.win.camara.x, my+self.win.camara.y
         self.win.camara.x += ((self.x-self.ww/2)-self.win.camara.x)/.3*dt
         self.win.camara.y += ((self.y-self.wh/2)-self.win.camara.y)/.3*dt
-
+        # if not pk.Mouse.is_left_click():
+        #     self.pointer.x, self.pointer.y = mx+self.win.camara.x, my+self.win.camara.y
+        #     self.win.camara.x += ((self.x-self.ww/2)-self.win.camara.x)/.3*dt
+        #     self.win.camara.y += ((self.y-self.wh/2)-self.win.camara.y)/.3*dt
+        # else:
+        #     self.win.camara.x += ((self.pointer.x-self.ww/2)-self.win.camara.x)/.3*dt
+        #     self.win.camara.y += ((self.pointer.y-self.wh/2)-self.win.camara.y)/.3*dt
+            
     def update(self, dt):
         self.input(dt)
-        self.move(dt)
-        self.win.blit([self])
+        self.camera(dt)
+        self.win.blit([self, self.pointer])
