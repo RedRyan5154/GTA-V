@@ -1,14 +1,19 @@
 import pygame
 import os
-import numpy as np
+try:
+    import numpy as np
+    has_numpy = 1
+except:
+    has_numpy = 0
 
 
 class Image:
     def __init__(self, path):
         if type(path) == str:
             self.image = pygame.image.load(path).convert_alpha()
-            if not np.any(pygame.surfarray.array_alpha(self.image) == 0):
-                self.image = pygame.image.load(path).convert()
+            if has_numpy:
+                if not np.any(pygame.surfarray.array_alpha(self.image) == 0):
+                    self.image = pygame.image.load(path).convert()
         else:
             self.image = path
 
@@ -22,8 +27,9 @@ class Animation:
                 out = os.path.join(path, filename)
                 key = filename[:-4]
                 self.uanimations[key] = pygame.image.load(out).convert_alpha()
-                if not np.any(pygame.surfarray.array_alpha(self.uanimations[key]) == 0):
-                    self.uanimations[key] = pygame.image.load(out).convert()
+                if has_numpy:
+                    if not np.any(pygame.surfarray.array_alpha(self.uanimations[key]) == 0):
+                        self.uanimations[key] = pygame.image.load(out).convert()
 
         sorted_keys = sorted(self.uanimations.keys())
         for i in sorted_keys:
@@ -47,9 +53,10 @@ class TileSet:
         image.blit(self.sheet, (0, 0), rect)
 
         
-        if not np.any(pygame.surfarray.array_alpha(image) == 0):
-            image = pygame.Surface(rect.size, depth=32).convert()
-            image.blit(self.sheet, (0, 0), rect)
+        if has_numpy:
+            if not np.any(pygame.surfarray.array_alpha(image) == 0):
+                image = pygame.Surface(rect.size, depth=32).convert()
+                image.blit(self.sheet, (0, 0), rect)
         return Image(image)
 
     def load(self, tile_dimensions=16):

@@ -50,7 +50,7 @@ class Window:
         self.icon = icon
         self.bg = (255, 255, 255)
         self.WIN = pygame.display.set_mode(
-            (self.width, self.height), display=0, vsync=1
+            (self.width, self.height)
         )
         pygame.display.set_caption(title)
         if self.icon:
@@ -107,7 +107,7 @@ class Window:
         return self.delta_time
 
     def setFullscreen(self):
-        self.WIN = pygame.display.set_mode((0, 0), FULLSCREEN | DOUBLEBUF, 16, vsync=1)
+        self.WIN = pygame.display.set_mode((0, 0), FULLSCREEN | DOUBLEBUF, 16)
         self.winsize_cache = self.winsize
 
     def render(self, ui=None):

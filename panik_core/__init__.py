@@ -1,6 +1,9 @@
 import os
 import sys
-import pretty_errors
+try:
+    import pretty_errors
+except:
+    pass
 
 os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "hide"
 
@@ -8,7 +11,11 @@ print("\n -- Welcome to Panik-Core Engine V0.8.7 --\n - The FPS Update -")
 
 import pygame
 from pygame.locals import *
-import pygame_gui
+try:
+    import pygame_gui
+    has_gui = 1
+except:
+    has_gui = 0
 
 pygame.mixer.init(48000, -16, 1, 1024)
 pygame.font.init()
@@ -18,7 +25,8 @@ pygame.init()
 from panik_core.window import *
 from panik_core.game_object import *
 from panik_core.assets import *
-from panik_core.ui import *
+if has_gui:
+    from panik_core.ui import *
 import panik_core.mouse as Mouse
 from panik_core.utils import *
 
@@ -26,24 +34,25 @@ from panik_core.utils import *
 
 
 QUIT = pygame.QUIT
-BUTTON_CLICKED = pygame_gui.UI_BUTTON_PRESSED
-BUTTON_DOUBLE_CLICKED = pygame_gui.UI_BUTTON_DOUBLE_CLICKED
-BUTTON_START_PRESS = pygame_gui.UI_BUTTON_START_PRESS
-BUTTON_HOVERED = pygame_gui.UI_BUTTON_ON_HOVERED
-BUTTON_UNHOVERED = pygame_gui.UI_BUTTON_ON_UNHOVERED
-TEXT_BOX_LINK_CLICKED = pygame_gui.UI_TEXT_BOX_LINK_CLICKED
-TEXT_ENTRY_CHANGED = pygame_gui.UI_TEXT_ENTRY_CHANGED
-TEXT_ENTRY_FINISHED = pygame_gui.UI_TEXT_ENTRY_FINISHED
-DROP_DOWN_MENU_CHANGED = pygame_gui.UI_DROP_DOWN_MENU_CHANGED
-HORIZONTAL_SLIDER_MOVED = pygame_gui.UI_HORIZONTAL_SLIDER_MOVED
-SELECTION_LIST_NEW_SELECTION = pygame_gui.UI_SELECTION_LIST_NEW_SELECTION
-SELECTION_LIST_REMOVE_SELECTION = pygame_gui.UI_SELECTION_LIST_DROPPED_SELECTION
-SELECTION_LIST_DOUBLE_SELECT = pygame_gui.UI_SELECTION_LIST_DOUBLE_CLICKED_SELECTION
-DIALOG_CONFIRMED = pygame_gui.UI_CONFIRMATION_DIALOG_CONFIRMED
-PATH_SELECTED = pygame_gui.UI_FILE_DIALOG_PATH_PICKED
-WINDOW_CLOSED = pygame_gui.UI_WINDOW_CLOSE
 KEY_PRESSED = pygame.KEYDOWN
 SCREENRESIZE = pygame.VIDEORESIZE
+if has_gui:
+    BUTTON_CLICKED = pygame_gui.UI_BUTTON_PRESSED
+    BUTTON_DOUBLE_CLICKED = pygame_gui.UI_BUTTON_DOUBLE_CLICKED
+    BUTTON_START_PRESS = pygame_gui.UI_BUTTON_START_PRESS
+    BUTTON_HOVERED = pygame_gui.UI_BUTTON_ON_HOVERED
+    BUTTON_UNHOVERED = pygame_gui.UI_BUTTON_ON_UNHOVERED
+    TEXT_BOX_LINK_CLICKED = pygame_gui.UI_TEXT_BOX_LINK_CLICKED
+    TEXT_ENTRY_CHANGED = pygame_gui.UI_TEXT_ENTRY_CHANGED
+    TEXT_ENTRY_FINISHED = pygame_gui.UI_TEXT_ENTRY_FINISHED
+    DROP_DOWN_MENU_CHANGED = pygame_gui.UI_DROP_DOWN_MENU_CHANGED
+    HORIZONTAL_SLIDER_MOVED = pygame_gui.UI_HORIZONTAL_SLIDER_MOVED
+    SELECTION_LIST_NEW_SELECTION = pygame_gui.UI_SELECTION_LIST_NEW_SELECTION
+    SELECTION_LIST_REMOVE_SELECTION = pygame_gui.UI_SELECTION_LIST_DROPPED_SELECTION
+    SELECTION_LIST_DOUBLE_SELECT = pygame_gui.UI_SELECTION_LIST_DOUBLE_CLICKED_SELECTION
+    DIALOG_CONFIRMED = pygame_gui.UI_CONFIRMATION_DIALOG_CONFIRMED
+    PATH_SELECTED = pygame_gui.UI_FILE_DIALOG_PATH_PICKED
+    WINDOW_CLOSED = pygame_gui.UI_WINDOW_CLOSE
 
 kA = pygame.K_a
 kB = pygame.K_b
