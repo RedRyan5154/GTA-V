@@ -23,6 +23,7 @@ class Map:
             0,
             self.map_parent,
         )
+        self.dev_tools_map.id = "dev"
         self.map_roads = pk.TileMap(
             "assets/map_roads.csv",
             16,
@@ -68,6 +69,6 @@ class Map:
                 self.map_asphalt,
                 self.map_outdoor_walls,
                 self.map_grass_sand,
-                self.dev_tools_map
+                self.dev_tools_map,
             ]
         )

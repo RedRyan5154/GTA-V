@@ -1,0 +1,1 @@
+directly call the update function of tilemaps when drawing them to the screen: (only one for loop instead of two)

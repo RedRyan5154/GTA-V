@@ -23,7 +23,7 @@ class Window:
             self.chx = random.randint(-intensity, intensity) / 100
             self.chy = random.randint(-intensity, intensity) / 100
 
-    def __init__(self, title, width, height, icon=None):
+    def __init__(self, width, height, title=None, icon=None):
         """
         Creates a window
 
@@ -49,10 +49,11 @@ class Window:
         self.devmode = False
         self.icon = icon
         self.bg = (255, 255, 255)
-        self.WIN = pygame.display.set_mode(
-            (self.width, self.height)
-        )
-        pygame.display.set_caption(title)
+        self.WIN = pygame.display.set_mode((self.width, self.height))
+        if title != None:
+            pygame.display.set_caption(title)
+        else:
+            pygame.display.set_caption("Panik-Core Engine v.0.8.8")
         if self.icon:
             pygame.display.set_icon(
                 pygame.transform.scale(

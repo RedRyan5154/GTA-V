@@ -31,7 +31,7 @@ class TileMap:
 
         self.width = len(data[0]) * self.tile_size
         self.height = len(data) * self.tile_size
-        
+
         self.hide = False
 
         class Tile(pygame.sprite.Sprite):
@@ -44,8 +44,7 @@ class TileMap:
                     tilesize,
                     tilesize,
                 )
-                self.mask = pygame.mask.from_surface(self.image)
-                self.mask   
+                self.colision_mask = pygame.mask.from_surface(self.image)
                 self.x, self.y = x * tilesize, y * tilesize
 
             def update(self, cx, cy, csx, csy, px, py):
@@ -150,7 +149,6 @@ class Element:
         self.parent = parent
         self.hide = False
         self.is_hud = False
-        
 
         ## perform the correct transformations
 
@@ -180,7 +178,8 @@ class Element:
         self.colision = pygame.Rect(
             self.x + relative_x - w / 2, self.y + relative_y - h / 2, w, h
         )
-        
+        self.colision_mask = pygame.mask.Mask((self.colision.w, self.colision.h))
+        self.colision_mask.fill()
 
     def is_coliding(self, colision):
         if self.colision:
@@ -193,15 +192,22 @@ class Element:
                     return self.colision.colliderect(colision.colision)
         else:
             raise Exception("You dont have any colisions set up for this element")
-                
+
     def is_coliding_tilemap(self, tilemap):
-        if self.colision:
-            sprite=pygame.sprite.Sprite()
-            sprite.rect = self.colision
-            return 1 if pygame.sprite.spritecollideany(sprite, tilemap.group) else 0
+        def check(sprite, tilemap):
+            for group_sprite in tilemap:
+                xoffset = group_sprite.rect.x - sprite.colision.x
+                yoffset = group_sprite.rect.y - sprite.colision.y
+                if sprite.colision_mask.overlap(
+                    group_sprite.colision_mask, (xoffset, yoffset)
+                ):
+                    return 1
+            return 0
+
+        if self.colision_mask:
+            return 1 if check(self, tilemap.group) else 0
         else:
             raise Exception("You dont have any colisions set up for this element")
-        
 
     # Movement ------------------------------------------------------------------------#
 
@@ -217,7 +223,9 @@ class Element:
         self.move_y(my)
         return mx, my, math.degrees(direction)
 
-    def try_move_in_direction(self, direction, pixels, colisions=[]) -> tuple[float, float, bool, bool, float]:
+    def try_move_in_direction(
+        self, direction, pixels, colisions=[]
+    ) -> tuple[float, float, bool, bool, float]:
         """
         Try move in direction (direction) (pixels) pixels
         Return: x, y, has_collided_x, has_collided_y, direction
@@ -225,11 +233,13 @@ class Element:
         direction = math.radians(direction)
         mx = math.cos(-direction) * pixels
         my = math.sin(-direction) * pixels
-        cx=self.try_move_x(mx, colisions)
-        cy=self.try_move_y(my, colisions)
+        cx = self.try_move_x(mx, colisions)
+        cy = self.try_move_y(my, colisions)
         return mx, my, cx, cy, math.degrees(direction)
 
-    def try_move_in_direction_tilemap(self, direction, pixels, tilemap) -> tuple[float, float, bool, bool, float]:
+    def try_move_in_direction_tilemap(
+        self, direction, pixels, tilemap
+    ) -> tuple[float, float, bool, bool, float]:
         """
         Try move in direction (direction) (pixels) pixels
         Return: x, y, has_collided_x, has_collided_y, direction
@@ -237,10 +247,10 @@ class Element:
         direction = math.radians(direction)
         mx = math.cos(-direction) * pixels
         my = math.sin(-direction) * pixels
-        cx=self.try_move_x_tilemap(mx, tilemap)
-        cy=self.try_move_y_tilemap(my, tilemap)
+        cx = self.try_move_x_tilemap(mx, tilemap)
+        cy = self.try_move_y_tilemap(my, tilemap)
         return mx, my, cx, cy, math.degrees(direction)
-    
+
     def move_towards(self, x, y, pixels) -> tuple[float, float, float]:
         """
         Move towards x/y
@@ -248,48 +258,52 @@ class Element:
         Example: player.move_towards(x-self.window.camara.x, y-self.window.camara.y, 30)
         Return: x, y, direction
         """
-        direction = -math.atan2(y-self.y, x-self.x)
+        direction = -math.atan2(y - self.y, x - self.x)
         mx = math.cos(-direction) * pixels
         my = math.sin(-direction) * pixels
         self.move_x(mx)
         self.move_y(my)
         return mx, my, math.degrees(direction)
-    
-    def try_move_towards(self, x, y, pixels, colisions=[]) -> tuple[float, float, bool, bool, float]:
+
+    def try_move_towards(
+        self, x, y, pixels, colisions=[]
+    ) -> tuple[float, float, bool, bool, float]:
         """
         Try moving towards x/y
         TIP: If using the camera, add the camera x and y to the initial x and y
         Example: player.move_towards(x-self.window.camara.x, y-self.window.camara.y, 30)
         Return: x, y, has_collided_x, has_collided_y, direction
         """
-        direction = -math.atan2(y-self.y, x-self.x)
+        direction = -math.atan2(y - self.y, x - self.x)
         mx = math.cos(-direction) * pixels
         my = math.sin(-direction) * pixels
-        cx=self.try_move_x(mx, colisions)
-        cy=self.try_move_y(my, colisions)
+        cx = self.try_move_x(mx, colisions)
+        cy = self.try_move_y(my, colisions)
         return mx, my, cx, cy, math.degrees(direction)
-    
-    def try_move_towards_tilemap(self, x, y, pixels, tilemap) -> tuple[float, float, bool, bool, float]:
+
+    def try_move_towards_tilemap(
+        self, x, y, pixels, tilemap
+    ) -> tuple[float, float, bool, bool, float]:
         """
         Move towards x/y
         TIP: If using the camera, add the camera x and y to the initial x and y
         Example: player.move_towards(x-self.window.camara.x, y-self.window.camara.y, 30)
         Return: x, y, has_collided_x, has_collided_y, direction
         """
-        direction = -math.atan2(y-self.y, x-self.x)
+        direction = -math.atan2(y - self.y, x - self.x)
         mx = math.cos(-direction) * pixels
         my = math.sin(-direction) * pixels
-        cx=self.try_move_x_tilemap(mx, tilemap)
-        cy=self.try_move_y_tilemap(my, tilemap)
+        cx = self.try_move_x_tilemap(mx, tilemap)
+        cy = self.try_move_y_tilemap(my, tilemap)
         return mx, my, cx, cy, math.degrees(direction)
-    
+
     def point_towards(self, x, y) -> float:
         """
         Point towards x/y
         TIP: If using the camera, add the camera x and y to the initial x and y
         Example: player.point_towards(x-self.window.camara.x, y-self.window.camara.y)
         """
-        self.rotation = math.degrees(-math.atan2(y-self.y, x-self.x))
+        self.rotation = math.degrees(-math.atan2(y - self.y, x - self.x))
         return self.rotation
 
     def move_x(self, x):
@@ -321,7 +335,7 @@ class Element:
             return True
         else:
             raise Exception("You dont have any colisions set up for this element")
-    
+
     def try_move_x_tilemap(self, x, tilemap):
         if self.colision:
             self.x += x

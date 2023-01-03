@@ -1,5 +1,6 @@
 import os
 import sys
+
 try:
     import pretty_errors
 except:
@@ -7,12 +8,20 @@ except:
 
 os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "hide"
 
-print("\n -- Welcome to Panik-Core Engine V0.8.7 --\n - The FPS Update -")
+print(
+    """
+-- Welcome to Panik-Core Engine v.0.8.8 --
+        - The Colisions Update -
+        
+        """
+)
 
 import pygame
 from pygame.locals import *
+
 try:
     import pygame_gui
+
     has_gui = 1
 except:
     has_gui = 0
@@ -25,6 +34,7 @@ pygame.init()
 from panik_core.window import *
 from panik_core.game_object import *
 from panik_core.assets import *
+
 if has_gui:
     from panik_core.ui import *
 import panik_core.mouse as Mouse

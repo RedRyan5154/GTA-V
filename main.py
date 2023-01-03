@@ -1,20 +1,26 @@
 import panik_core as pk
 from map import Map
 from player import Player
+import asyncio
 
+try:
+    import cProfile
+
+    profiler = 1
+except:
+    profiler = 0
 
 
 class Game:
     def __init__(self):
-        self.win = pk.Window("My Window", 1080, 720)
+        self.win = pk.Window(1080, 720)
         self.win.showfps = True
         self.win.setFullscreen()
 
         self.map = Map(self.win)
-        self.player = Player(self.win, self.map)        
-        
+        self.player = Player(self.win, self.map)
 
-    def run(self):
+    async def run(self):
         run = 1
 
         while run:
@@ -33,13 +39,17 @@ class Game:
                         self.win.devmode = not self.win.devmode
 
             self.map.update(dt)
-            
+
             self.player.update(dt)
             # self.pointer.point_towards(self.win.wwidth/2, self.win.wheight/2)
-            
+
             self.win.render()
+            await asyncio.sleep(0)
 
 
 if __name__ == "__main__":
     game = Game()
-    game.run()
+    if profiler:
+        cProfile.run("asyncio.run(game.run())", sort="tottime")
+    else:
+        asyncio.run(game.run())
