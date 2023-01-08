@@ -1,7 +1,9 @@
 import pygame
 import os
+
 try:
     import numpy as np
+
     has_numpy = 1
 except:
     has_numpy = 0
@@ -28,7 +30,9 @@ class Animation:
                 key = filename[:-4]
                 self.uanimations[key] = pygame.image.load(out).convert_alpha()
                 if has_numpy:
-                    if not np.any(pygame.surfarray.array_alpha(self.uanimations[key]) == 0):
+                    if not np.any(
+                        pygame.surfarray.array_alpha(self.uanimations[key]) == 0
+                    ):
                         self.uanimations[key] = pygame.image.load(out).convert()
 
         sorted_keys = sorted(self.uanimations.keys())
@@ -52,7 +56,6 @@ class TileSet:
         image = pygame.Surface(rect.size, pygame.SRCALPHA, 32).convert_alpha()
         image.blit(self.sheet, (0, 0), rect)
 
-        
         if has_numpy:
             if not np.any(pygame.surfarray.array_alpha(image) == 0):
                 image = pygame.Surface(rect.size, depth=32).convert()

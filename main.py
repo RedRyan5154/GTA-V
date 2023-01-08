@@ -1,6 +1,7 @@
 import panik_core as pk
 from map import Map
 from player import Player
+from cars import SportsCar
 import asyncio
 
 try:
@@ -19,6 +20,7 @@ class Game:
 
         self.map = Map(self.win)
         self.player = Player(self.win, self.map)
+        self.car = SportsCar(self.win, "Sports-1")
 
     async def run(self):
         run = 1
@@ -41,6 +43,7 @@ class Game:
             self.map.update(dt)
 
             self.player.update(dt)
+            self.car.update(dt)
             # self.pointer.point_towards(self.win.wwidth/2, self.win.wheight/2)
 
             self.win.render()
